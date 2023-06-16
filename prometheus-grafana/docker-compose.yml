@@ -62,6 +62,8 @@ services:
       - influxdb
     ports: 
       - 3002:3000 
+    environment:
+      - GF_SERVER_DOMAIN=grafana.sebas-tien.com
     restart: unless-stopped 
     volumes: 
       - /docker/prometheus-grafana/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources 
