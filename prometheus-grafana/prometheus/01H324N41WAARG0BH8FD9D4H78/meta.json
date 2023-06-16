@@ -1,0 +1,17 @@
+{
+	"ulid": "01H324N41WAARG0BH8FD9D4H78",
+	"minTime": 1686909600187,
+	"maxTime": 1686916800000,
+	"stats": {
+		"numSamples": 11722353,
+		"numSeries": 21594,
+		"numChunks": 92034
+	},
+	"compaction": {
+		"level": 1,
+		"sources": [
+			"01H324N41WAARG0BH8FD9D4H78"
+		]
+	},
+	"version": 1
+}

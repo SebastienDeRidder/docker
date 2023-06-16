@@ -1,0 +1,17 @@
+{
+	"ulid": "01H32BGVB2JVM41EB0FZYQQ4N7",
+	"minTime": 1686916800022,
+	"maxTime": 1686924000000,
+	"stats": {
+		"numSamples": 21161317,
+		"numSeries": 27099,
+		"numChunks": 177012
+	},
+	"compaction": {
+		"level": 1,
+		"sources": [
+			"01H32BGVB2JVM41EB0FZYQQ4N7"
+		]
+	},
+	"version": 1
+}

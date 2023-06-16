@@ -1,0 +1,116 @@
+version: '3.8' 
+networks: 
+  monitoring: 
+    driver: bridge 
+volumes: 
+  prometheus_data: {} 
+  influxdb_data: {}
+
+services: 
+
+  node-exporter: 
+    image: prom/node-exporter:latest 
+    container_name: node-exporter 
+    restart: unless-stopped 
+    user: "0" 
+    environment: 
+      - PUID=0 
+      - PGID=0
+    volumes: 
+      - /proc:/host/proc:ro 
+      - /sys:/host/sys:ro 
+      - /:/rootfs:ro 
+      - /var/lib/node_exporter/textfile_collector:/var/lib/node_exporter/textfile_collector
+    command: 
+      - '--path.procfs=/host/proc' 
+      - '--path.rootfs=/rootfs' 
+      - '--path.sysfs=/host/sys' 
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)' 
+      - '--collector.textfile.directory=/var/lib/node_exporter/textfile_collector'
+    ports: 
+      - 9100:9100 
+    networks: 
+      - monitoring 
+
+  prometheus: 
+    image: prom/prometheus:latest 
+    user: "0" 
+    environment: 
+      - PUID=0 
+      - PGID=0
+    container_name: prometheus 
+    restart: unless-stopped 
+    volumes: 
+      - /docker/prometheus-grafana/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml 
+      - /docker/prometheus-grafana/prometheus:/prometheus 
+    command: 
+      - '--config.file=/etc/prometheus/prometheus.yml' 
+      - '--storage.tsdb.path=/prometheus' 
+      - '--web.console.libraries=/etc/prometheus/console_libraries' 
+      - '--web.console.templates=/etc/prometheus/consoles' 
+      - '--web.enable-lifecycle' 
+    ports: 
+      - 9090:9090 
+    networks: 
+      - monitoring 
+
+  grafana: 
+    image: grafana/grafana:latest 
+    user: "0" 
+    container_name: grafana 
+    depends_on:
+      - influxdb
+    ports: 
+      - 3002:3000 
+    restart: unless-stopped 
+    volumes: 
+      - /docker/prometheus-grafana/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources 
+      - /docker/prometheus-grafana/grafana:/var/lib/grafana 
+    networks: 
+      - monitoring 
+
+  cadvisor: 
+    image: gcr.io/cadvisor/cadvisor:latest 
+    container_name: cadvisor 
+    ports: 
+      - 8081:8080 
+    networks: 
+      - monitoring 
+    volumes: 
+      - /:/rootfs:ro 
+      - /var/run:/var/run:rw 
+      - /sys:/sys:ro 
+      - /var/lib/docker/:/var/lib/docker:ro 
+    depends_on: 
+      - redis 
+
+  redis: 
+    image: redis:latest 
+    container_name: redis 
+    ports: 
+      - 6379:6379 
+    networks: 
+      - monitoring
+
+  influxdb:
+    image: influxdb:2.1-alpine
+    container_name: influxdb
+    restart: always
+    ports:
+      - '8086:8086'
+    volumes:
+      - influxdb_data:/var/lib/influxdb2
+      - ./influxdb2:/etc/influxdb2
+
+  telegraf:
+    image: telegraf
+    container_name: telegraf
+    restart: always
+    volumes:
+    - ./telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
+    depends_on:
+      - influxdb
+    links:
+      - influxdb
+    ports:
+    - '8125:8125'
