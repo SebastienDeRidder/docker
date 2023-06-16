@@ -1,0 +1,17 @@
+{
+	"ulid": "01H330DS3ZY13GXPJRRE2HMYQS",
+	"minTime": 1686931200066,
+	"maxTime": 1686938400000,
+	"stats": {
+		"numSamples": 7548030,
+		"numSeries": 23499,
+		"numChunks": 79426
+	},
+	"compaction": {
+		"level": 1,
+		"sources": [
+			"01H330DS3ZY13GXPJRRE2HMYQS"
+		]
+	},
+	"version": 1
+}
